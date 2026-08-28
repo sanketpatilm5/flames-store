@@ -1,9 +1,12 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../src/generated/prisma/client";
 
-const db = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const db = new PrismaClient({ adapter });
 
 function productImages(slug: string): { imageUrl: string; altImageUrl: string | null; images: string } {
   const dir = path.join(process.cwd(), "public", "products", slug);

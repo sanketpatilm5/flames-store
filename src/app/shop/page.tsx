@@ -5,7 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { ShopSearch } from "@/components/ShopSearch";
 import { Reveal } from "@/components/Reveal";
 import { Sparkles } from "@/components/Decor";
-import type { Prisma } from "@prisma/client";
+import type { Prisma } from "@/generated/prisma/client";
 
 type SearchParams = Promise<{
   q?: string;

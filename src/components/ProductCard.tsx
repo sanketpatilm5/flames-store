@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { AddToCartButton } from "@/components/AddToCartButton";
-import type { Product } from "@prisma/client";
+import type { Product } from "@/generated/prisma/client";
 
 type ProductCardProps = {
   product: Product;

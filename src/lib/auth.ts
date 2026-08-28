@@ -4,29 +4,10 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { mergeGuestCartIntoUser } from "@/lib/cart";
 import { loginSchema } from "@/lib/validations";
-
-declare module "next-auth" {
-  interface User {
-    role: "CUSTOMER" | "ADMIN";
-  }
-  interface Session {
-    user: {
-      id: string;
-      email: string;
-      name?: string | null;
-      role: "CUSTOMER" | "ADMIN";
-    };
-  }
-}
-
-declare module "@auth/core/jwt" {
-  interface JWT {
-    id: string;
-    role: "CUSTOMER" | "ADMIN";
-  }
-}
+import { authConfig } from "@/lib/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -54,26 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  session: { strategy: "jwt" },
-  pages: {
-    signIn: "/login",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id!;
-        token.role = user.role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as "CUSTOMER" | "ADMIN";
-      }
-      return session;
-    },
-  },
   events: {
     async signIn({ user }) {
       if (user.id) await mergeGuestCartIntoUser(user.id);
