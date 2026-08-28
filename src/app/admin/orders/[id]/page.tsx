@@ -1,17 +1,24 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatusSelect } from "@/components/OrderStatusSelect";
 
 type PageProps = { params: Promise<{ id: string }> };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOrderDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const order = await db.order.findUnique({
-    where: { id },
-    include: { items: true, user: { select: { email: true, name: true } } },
-  });
+  const order = await runQuery(
+    () =>
+      db.order.findUnique({
+        where: { id },
+        include: { items: true, user: { select: { email: true, name: true } } },
+      }),
+    null,
+  );
   if (!order) notFound();
 
   return (

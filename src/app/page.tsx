@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { ProductCard } from "@/components/ProductCard";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Reveal } from "@/components/Reveal";
@@ -83,11 +84,15 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   await connection();
 
-  const products = await db.product.findMany({
-    where: { isActive: true, isFeatured: true },
-    orderBy: { name: "asc" },
-    take: 6,
-  });
+  const products = await runQuery(
+    () =>
+      db.product.findMany({
+        where: { isActive: true, isFeatured: true },
+        orderBy: { name: "asc" },
+        take: 6,
+      }),
+    [],
+  );
 
   // The hero deck is just the featured melts, shuffled to the front of the hand.
   const heroCards: HeroCard[] = products.map((product) => ({

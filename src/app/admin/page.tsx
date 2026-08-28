@@ -1,21 +1,28 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata = { title: "Admin dashboard" };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
-  const [productCount, orderCount, revenue, lowStock, recentOrders] = await Promise.all([
-    db.product.count({ where: { isActive: true } }),
-    db.order.count({ where: { paymentStatus: "COMPLETED" } }),
-    db.order.aggregate({ _sum: { total: true }, where: { paymentStatus: "COMPLETED" } }),
-    db.product.findMany({ where: { isActive: true, stock: { lte: 5 } }, orderBy: { stock: "asc" } }),
-    db.order.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { user: { select: { email: true, name: true } } },
-    }),
-  ]);
+  const [productCount, orderCount, revenue, lowStock, recentOrders] = await runQuery(
+    () =>
+      Promise.all([
+        db.product.count({ where: { isActive: true } }),
+        db.order.count({ where: { paymentStatus: "COMPLETED" } }),
+        db.order.aggregate({ _sum: { total: true }, where: { paymentStatus: "COMPLETED" } }),
+        db.product.findMany({ where: { isActive: true, stock: { lte: 5 } }, orderBy: { stock: "asc" } }),
+        db.order.findMany({
+          take: 5,
+          orderBy: { createdAt: "desc" },
+          include: { user: { select: { email: true, name: true } } },
+        }),
+      ]),
+    [0, 0, { _sum: { total: 0 } }, [], []],
+  );
 
   const stats = [
     { icon: "🕯️", label: "Active products", value: productCount, tint: "var(--color-bubble-lt)" },

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { isBuildTime, runQuery } from "@/lib/runtime-db";
 import { formatPrice, parseProductImages, FREE_SHIPPING_THRESHOLD_PAISE } from "@/lib/utils";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductGallery } from "@/components/ProductGallery";
@@ -16,22 +17,35 @@ const PROMISES = [
 ];
 
 export async function generateMetadata({ params }: PageProps) {
+  if (isBuildTime()) return { title: "Shop" };
   const { slug } = await params;
-  const product = await db.product.findFirst({ where: { slug, isActive: true } });
+  const product = await runQuery(
+    () => db.product.findFirst({ where: { slug, isActive: true } }),
+    null,
+  );
   if (!product) return { title: "Product not found" };
   return { title: product.name, description: product.description };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductPage({ params }: PageProps) {
   const { slug } = await params;
-  const product = await db.product.findFirst({ where: { slug, isActive: true } });
+  const product = await runQuery(
+    () => db.product.findFirst({ where: { slug, isActive: true } }),
+    null,
+  );
   if (!product) notFound();
 
-  const related = await db.product.findMany({
-    where: { isActive: true, NOT: { id: product.id } },
-    orderBy: { isFeatured: "desc" },
-    take: 3,
-  });
+  const related = await runQuery(
+    () =>
+      db.product.findMany({
+        where: { isActive: true, NOT: { id: product.id } },
+        orderBy: { isFeatured: "desc" },
+        take: 3,
+      }),
+    [],
+  );
 
   const images = [product.imageUrl, product.altImageUrl, ...parseProductImages(product.images)].filter(
     Boolean,

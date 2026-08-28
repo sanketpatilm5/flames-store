@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { formatPrice } from "@/lib/utils";
 import { Confetti } from "@/components/Confetti";
 
@@ -22,6 +23,8 @@ export async function generateMetadata({ params }: PageProps) {
   return { title: `Order ${id}` };
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function OrderDetailPage({ params, searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) notFound();
@@ -29,13 +32,17 @@ export default async function OrderDetailPage({ params, searchParams }: PageProp
   const { id } = await params;
   const { success } = await searchParams;
 
-  const order = await db.order.findFirst({
-    where: {
-      OR: [{ id }, { orderNumber: id }],
-      ...(session.user.role === "ADMIN" ? {} : { userId: session.user.id }),
-    },
-    include: { items: true },
-  });
+  const order = await runQuery(
+    () =>
+      db.order.findFirst({
+        where: {
+          OR: [{ id }, { orderNumber: id }],
+          ...(session.user.role === "ADMIN" ? {} : { userId: session.user.id }),
+        },
+        include: { items: true },
+      }),
+    null,
+  );
 
   if (!order) notFound();
 

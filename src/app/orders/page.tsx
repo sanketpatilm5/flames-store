@@ -1,21 +1,27 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { formatPrice } from "@/lib/utils";
 import { redirect } from "next/navigation";
 import { Reveal } from "@/components/Reveal";
 
 export const metadata = { title: "Your orders" };
+export const dynamic = "force-dynamic";
 
 export default async function OrdersPage() {
   const session = await auth();
   if (!session?.user) redirect("/login?callbackUrl=/orders");
 
-  const orders = await db.order.findMany({
-    where: { userId: session.user.id },
-    include: { items: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const orders = await runQuery(
+    () =>
+      db.order.findMany({
+        where: { userId: session.user.id },
+        include: { items: true },
+        orderBy: { createdAt: "desc" },
+      }),
+    [],
+  );
 
   return (
     <section className="section-y-sm">

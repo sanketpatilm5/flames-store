@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { ProductCard } from "@/components/ProductCard";
 import { ShopSearch } from "@/components/ShopSearch";
 import { Reveal } from "@/components/Reveal";
@@ -16,6 +17,8 @@ type SearchParams = Promise<{
 }>;
 
 export const metadata = { title: "Shop" };
+
+export const dynamic = "force-dynamic";
 
 export default async function ShopPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
@@ -52,7 +55,7 @@ export default async function ShopPage({ searchParams }: { searchParams: SearchP
           ? { name: "asc" }
           : { createdAt: "desc" };
 
-  const products = await db.product.findMany({ where, orderBy });
+  const products = await runQuery(() => db.product.findMany({ where, orderBy }), []);
 
   return (
     <section className="section-y-sm relative overflow-hidden">

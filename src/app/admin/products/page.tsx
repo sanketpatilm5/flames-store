@@ -1,12 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { db } from "@/lib/db";
+import { runQuery } from "@/lib/runtime-db";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata = { title: "Manage products" };
+export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
-  const products = await db.product.findMany({ orderBy: { createdAt: "desc" } });
+  const products = await runQuery(
+    () => db.product.findMany({ orderBy: { createdAt: "desc" } }),
+    [],
+  );
 
   return (
     <div>

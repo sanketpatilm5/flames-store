@@ -1,12 +1,13 @@
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import { getDatabaseUrl } from "../src/lib/db-url";
 import "dotenv/config";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = getDatabaseUrl();
 const adapter = connectionString.includes("neon.tech")
   ? new PrismaNeon({ connectionString })
   : new PrismaPg({ connectionString, ssl: { rejectUnauthorized: false } });
