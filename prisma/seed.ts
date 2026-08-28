@@ -2,10 +2,14 @@ import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
 import "dotenv/config";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const connectionString = process.env.DATABASE_URL!;
+const adapter = connectionString.includes("neon.tech")
+  ? new PrismaNeon({ connectionString })
+  : new PrismaPg({ connectionString, ssl: { rejectUnauthorized: false } });
 const db = new PrismaClient({ adapter });
 
 function productImages(slug: string): { imageUrl: string; altImageUrl: string | null; images: string } {

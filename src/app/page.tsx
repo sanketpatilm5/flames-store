@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { db } from "@/lib/db";
 import { ProductCard } from "@/components/ProductCard";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -77,7 +78,11 @@ const FAQ = [
   },
 ];
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
+  await connection();
+
   const products = await db.product.findMany({
     where: { isActive: true, isFeatured: true },
     orderBy: { name: "asc" },

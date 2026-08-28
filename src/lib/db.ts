@@ -1,3 +1,4 @@
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 
@@ -9,10 +10,12 @@ function createPrismaClient() {
     throw new Error("DATABASE_URL environment variable is not set");
   }
 
-  const adapter = new PrismaPg({
-    connectionString,
-    ssl: connectionString.includes("neon.tech") ? { rejectUnauthorized: false } : undefined,
-  });
+  const adapter = connectionString.includes("neon.tech")
+    ? new PrismaNeon({ connectionString })
+    : new PrismaPg({
+        connectionString,
+        ssl: { rejectUnauthorized: false },
+      });
 
   return new PrismaClient({
     adapter,
