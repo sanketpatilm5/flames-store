@@ -38,6 +38,9 @@ export const viewport: Viewport = {
   themeColor: "#fff0f4",
 };
 
+// E-commerce pages read from the database — skip static generation at build time
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
