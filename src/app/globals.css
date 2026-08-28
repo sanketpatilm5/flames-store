@@ -1,26 +1,980 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ==========================================================================
+   Flames — design tokens
+   ========================================================================== */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* brand */
+  --color-flame: #e8384f;
+  --color-flame-dk: #c8283c;
+  --color-flame-lt: #ff7c90;
+  --color-bubble: #f87ca4;
+  --color-bubble-lt: #ffb6cd;
+  --color-blush: #fff0f4;
+  --color-blush-dp: #ffe1ea;
+  --color-cream: #fff9f0;
+  --color-ink: #43242d;
+  --color-ink-soft: #8a6570;
+  --color-ink-faint: #bd9ea9;
+
+  /* playful accents */
+  --color-mint: #63d2b8;
+  --color-lav: #b3a2f2;
+  --color-butter: #ffd166;
+  --color-peach: #ffab86;
+  --color-sky: #92cdff;
+
+  --font-display: var(--font-fredoka);
+  --font-body: var(--font-quicksand);
+  --font-script: var(--font-pacifico);
+
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-bob: bob 3.4s ease-in-out infinite;
+  --animate-wiggle: wiggle 2.8s ease-in-out infinite;
+  --animate-twinkle: twinkle 2.6s ease-in-out infinite;
+  --animate-heartbeat: heartbeat 1.9s ease-in-out infinite;
+  --animate-blob: blob 20s ease-in-out infinite;
+  --animate-shimmer: shimmer 1.5s linear infinite;
+  --animate-pop-in: pop-in 0.42s cubic-bezier(0.22, 1.4, 0.36, 1) both;
+  --animate-rise: rise 0.6s cubic-bezier(0.2, 0.9, 0.25, 1) both;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --ease-out: cubic-bezier(0.2, 0.9, 0.25, 1);
+  --ease-pop: cubic-bezier(0.22, 1.4, 0.36, 1);
+
+  --shadow-soft: 0 10px 30px -14px rgba(160, 60, 90, 0.3);
+  --shadow-lift: 0 26px 60px -26px rgba(160, 60, 90, 0.45);
+  --shadow-sticker: 0 7px 0 -2px rgba(200, 40, 60, 0.26), 0 14px 34px -16px rgba(160, 60, 90, 0.4);
+
+  --grad-candy: linear-gradient(135deg, #ff8fab 0%, #e8384f 58%, #c8283c 100%);
+  --grad-text: linear-gradient(100deg, #e8384f 0%, #f87ca4 45%, #b3a2f2 100%);
+
+  --radius-blob: 42% 58% 54% 46% / 48% 44% 56% 52%;
+  --header-h: 78px;
+}
+
+/* ==========================================================================
+   Keyframes (unlayered — animation names are global)
+   ========================================================================== */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-16px) rotate(2.5deg); }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.22); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.16); }
+  60% { transform: scale(1); }
+}
+
+@keyframes blob {
+  0%, 100% {
+    border-radius: 42% 58% 54% 46% / 48% 44% 56% 52%;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  33% {
+    border-radius: 58% 42% 38% 62% / 56% 60% 40% 44%;
+    transform: translate3d(14px, -18px, 0) rotate(6deg);
+  }
+  66% {
+    border-radius: 38% 62% 62% 38% / 40% 52% 48% 60%;
+    transform: translate3d(-12px, 12px, 0) rotate(-5deg);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes shimmer {
+  from { background-position: -160% 0; }
+  to { background-position: 160% 0; }
+}
+
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.86) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ribbon {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes sheen {
+  from { transform: translateX(-120%) skewX(-18deg); }
+  to { transform: translateX(320%) skewX(-18deg); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes halo {
+  0% { box-shadow: 0 0 0 0 rgba(248, 124, 164, 0.65); }
+  70% { box-shadow: 0 0 0 18px rgba(248, 124, 164, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(248, 124, 164, 0); }
+}
+
+@keyframes confetti-fall {
+  0% { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(150px) rotate(430deg); }
+}
+
+@keyframes count-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-blush);
+    color: var(--color-ink);
+    font-family: var(--font-body), system-ui, sans-serif;
+    overflow-x: clip;
+  }
+
+  /* Soft blush glow behind everything, so flat sections never look flat. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60ch 48ch at 12% -6%, rgba(255, 182, 205, 0.5), transparent 70%),
+      radial-gradient(52ch 44ch at 92% 4%, rgba(179, 162, 242, 0.26), transparent 70%),
+      radial-gradient(70ch 50ch at 50% 108%, rgba(255, 209, 102, 0.22), transparent 72%);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.012em;
+  }
+
+  p {
+    line-height: 1.68;
+  }
+
+  ::selection {
+    background: var(--color-bubble-lt);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-bubble);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Candy scrollbar */
+  * {
+    scrollbar-color: var(--color-bubble-lt) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 11px;
+    height: 11px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-blush-dp);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bubble-lt);
+    border: 3px solid var(--color-blush-dp);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-bubble);
+  }
+}
+
+/* ==========================================================================
+   Components
+   Everything below sits in the components layer so Tailwind utilities written
+   in markup (bg-white, py-1, …) can still override it.
+   ========================================================================== */
+
+@layer components {
+  /* ------------------------------------------------------------- layout */
+
+  .shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1180px;
+    padding-inline: clamp(1.15rem, 4vw, 2.5rem);
+  }
+
+  .section-y {
+    padding-block: clamp(4rem, 9vw, 7.5rem);
+  }
+
+  .section-y-sm {
+    padding-block: clamp(3rem, 7vw, 5rem);
+  }
+
+  /* --------------------------------------------------------- typography */
+
+  .script {
+    font-family: var(--font-script), cursive;
+    font-weight: 400;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    font-family: var(--font-display), sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: var(--color-flame);
+  }
+
+  .text-gradient {
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .link-swipe {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .link-swipe::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-bubble);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.32s var(--ease-out);
+  }
+
+  .link-swipe:hover::after,
+  .link-swipe:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* ------------------------------------------------------------ buttons */
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.88em 1.7em;
+    border-radius: 999px;
+    background: var(--grad-candy);
+    color: #fff;
+    font-family: var(--font-display), sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: var(--shadow-sticker);
+    transition:
+      transform 0.22s var(--ease-pop),
+      box-shadow 0.22s var(--ease-out),
+      filter 0.22s;
+  }
+
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.42), transparent);
+    transform: translateX(-120%) skewX(-18deg);
+    pointer-events: none;
+  }
+
+  .btn:hover::before {
+    animation: sheen 0.75s var(--ease-out);
+  }
+
+  .btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 11px 0 -2px rgba(200, 40, 60, 0.24),
+      0 22px 44px -18px rgba(160, 60, 90, 0.5);
+  }
+
+  .btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 0 -1px rgba(200, 40, 60, 0.3);
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(0.35);
+  }
+
+  .btn:disabled:hover::before {
+    animation: none;
+  }
+
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--color-flame);
+    box-shadow: inset 0 0 0 2.5px var(--color-bubble-lt);
+    backdrop-filter: blur(6px);
+  }
+
+  .btn-ghost:hover {
+    background: #fff;
+    box-shadow:
+      inset 0 0 0 2.5px var(--color-bubble),
+      0 16px 34px -20px rgba(160, 60, 90, 0.5);
+  }
+
+  .btn-ghost:active {
+    box-shadow: inset 0 0 0 2.5px var(--color-bubble);
+  }
+
+  .btn-white {
+    background: #fff;
+    color: var(--color-flame);
+    box-shadow: 0 7px 0 -2px rgba(160, 60, 90, 0.18), 0 14px 34px -16px rgba(90, 30, 50, 0.4);
+  }
+
+  .btn-white:hover {
+    background: var(--color-blush);
+  }
+
+  .btn-sm {
+    padding: 0.62em 1.25em;
+    font-size: 0.92rem;
+  }
+
+  .btn-lg {
+    padding: 1em 2.1em;
+    font-size: 1.08rem;
+  }
+
+  /* ----------------------------------------------------------- surfaces */
+
+  .panel {
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+  }
+
+  .panel-pad {
+    padding: clamp(1.35rem, 3vw, 2rem);
+  }
+
+  .glass {
+    background: rgba(255, 240, 244, 0.72);
+    backdrop-filter: blur(16px) saturate(1.35);
+    -webkit-backdrop-filter: blur(16px) saturate(1.35);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.42em 0.95em;
+    border-radius: 999px;
+    background: #fff;
+    font-family: var(--font-display), sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-ink);
+    box-shadow: var(--shadow-soft);
+    white-space: nowrap;
+  }
+
+  .chip-tinted {
+    background: var(--color-blush-dp);
+    box-shadow: none;
+  }
+
+  /* Order / payment status pills */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.3em 0.85em;
+    border-radius: 999px;
+    font-family: var(--font-display), sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: capitalize;
+  }
+
+  .pill::before {
+    content: "";
+    width: 0.5em;
+    height: 0.5em;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .pill-pending { background: #fff4dd; color: #a4700c; }
+  .pill-paid { background: #e2f7ef; color: #1b7a5c; }
+  .pill-processing { background: #ece7ff; color: #5a44b8; }
+  .pill-shipped { background: #e2f0ff; color: #1f6aa8; }
+  .pill-delivered { background: #e0f6e9; color: #1c7a45; }
+  .pill-cancelled { background: #ffe6ea; color: #b02339; }
+  .pill-completed { background: #e2f7ef; color: #1b7a5c; }
+  .pill-failed { background: #ffe6ea; color: #b02339; }
+  .pill-refunded { background: #ece7ff; color: #5a44b8; }
+
+  /* ------------------------------------------------------- product card */
+
+  .card-product {
+    position: relative;
+    border-radius: 26px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition:
+      transform 0.3s var(--ease-pop),
+      box-shadow 0.3s var(--ease-out);
+  }
+
+  .card-product::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 2px transparent;
+    transition: box-shadow 0.3s var(--ease-out);
+  }
+
+  .card-product:hover,
+  .card-product:focus-within {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .card-product:hover::after,
+  .card-product:focus-within::after {
+    box-shadow: inset 0 0 0 2px var(--accent, var(--color-bubble-lt));
+  }
+
+  .card-media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--tint, var(--color-blush-dp));
+  }
+
+  .card-media img {
+    transition: transform 0.65s var(--ease-out);
+  }
+
+  .card-product:hover .card-media img {
+    transform: scale(1.07);
+  }
+
+  .card-peek {
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .card-product:hover .card-peek {
+    transform: translateX(4px);
+  }
+
+  /* Second photo cross-fades in on hover. */
+  .card-media-alt {
+    opacity: 0;
+    transition: opacity 0.55s var(--ease-out);
+  }
+
+  .card-product:hover .card-media-alt,
+  .card-product:focus-within .card-media-alt {
+    opacity: 1;
+  }
+
+  /* Quick-add bar: always visible on touch, slides up on hover elsewhere. */
+  .card-quick {
+    transition:
+      opacity 0.3s var(--ease-out),
+      transform 0.3s var(--ease-pop);
+  }
+
+  @media (hover: hover) {
+    .card-quick {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+
+    .card-product:hover .card-quick,
+    .card-product:focus-within .card-quick {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* -------------------------------------------------------------- forms */
+
+  .input {
+    width: 100%;
+    padding: 0.78rem 1rem;
+    border-radius: 16px;
+    border: 2px solid var(--color-blush-dp);
+    background: #fff;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--color-ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .input::placeholder {
+    color: var(--color-ink-faint);
+  }
+
+  .input:hover {
+    border-color: var(--color-bubble-lt);
+  }
+
+  .input:focus {
+    outline: none;
+    border-color: var(--color-bubble);
+    box-shadow: 0 0 0 4px rgba(248, 124, 164, 0.28);
+  }
+
+  .label {
+    display: block;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+    color: var(--color-ink);
+  }
+
+  /* Cute square checkbox */
+  .check {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    border-radius: 7px;
+    border: 2px solid var(--color-blush-dp);
+    background: #fff;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s var(--ease-pop);
+  }
+
+  .check::after {
+    content: "";
+    width: 0.4rem;
+    height: 0.7rem;
+    margin-top: -3px;
+    border: solid #fff;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.2s var(--ease-pop);
+  }
+
+  .check:checked {
+    background: var(--color-flame);
+    border-color: var(--color-flame);
+  }
+
+  .check:checked::after {
+    transform: rotate(45deg) scale(1);
+  }
+
+  .check:hover {
+    transform: scale(1.08);
+  }
+
+  .price {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    font-size: 1.22rem;
+    color: var(--color-flame);
+  }
+
+  /* --------------------------------------------------------- decoration */
+
+  .blob {
+    position: absolute;
+    border-radius: var(--radius-blob);
+    filter: blur(2px);
+    pointer-events: none;
+    animation: blob 20s ease-in-out infinite;
+  }
+
+  .sparkle {
+    position: absolute;
+    pointer-events: none;
+    animation: twinkle 2.6s ease-in-out infinite;
+  }
+
+  .dots {
+    background-image: radial-gradient(var(--color-bubble-lt) 1.6px, transparent 1.6px);
+    background-size: 16px 16px;
+  }
+
+  /* ------------------------------------------------------- frosted cards */
+
+  /* A crisp, cold-looking edge: white rim plus a faint inner glow. */
+  .card-ice {
+    box-shadow:
+      0 30px 70px -30px rgba(160, 60, 90, 0.6),
+      inset 0 0 0 1.5px rgba(255, 255, 255, 0.75),
+      inset 0 1px 22px rgba(255, 255, 255, 0.35);
+  }
+
+  /* Diagonal sheet of gloss across the photo, like light off ice. */
+  .card-frost {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    transition: opacity 0.3s var(--ease-out);
+    background:
+      linear-gradient(
+        128deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.14) 26%,
+        rgba(255, 255, 255, 0) 46%,
+        rgba(255, 255, 255, 0) 72%,
+        rgba(198, 232, 255, 0.28) 100%
+      );
+  }
+
+  .confetti-piece {
+    position: absolute;
+    top: 0;
+    width: 9px;
+    height: 14px;
+    border-radius: 3px;
+    opacity: 0;
+    animation: confetti-fall 2.6s var(--ease-out) forwards;
+  }
+
+  .ribbon-track,
+  .marquee-track {
+    animation: ribbon 28s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* ------------------------------------------------------ scroll reveal
+     Content is only pre-hidden where scripting is on, so a reader without
+     JavaScript gets the whole page rather than a stack of invisible boxes. */
+
+  @media (scripting: enabled) {
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+    }
+
+    .reveal-zoom {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+
+    .reveal.is-in,
+    .reveal-zoom.is-in {
+      opacity: 1;
+      transform: none;
+      transition:
+        opacity 0.7s var(--ease-out) var(--reveal-delay, 0ms),
+        transform 0.7s var(--ease-out) var(--reveal-delay, 0ms);
+    }
+  }
+
+  /* ----------------------------------------------------- loading states */
+
+  .skeleton {
+    background: linear-gradient(
+      100deg,
+      var(--color-blush-dp) 30%,
+      #fff 48%,
+      var(--color-blush-dp) 66%
+    );
+    background-size: 220% 100%;
+    animation: shimmer 1.5s linear infinite;
+    border-radius: 16px;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 999px;
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* -------------------------------------------------------------- toast */
+
+  .toast {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.15rem;
+    border-radius: 20px;
+    background: #fff;
+    color: var(--color-ink);
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    box-shadow: var(--shadow-lift);
+    border: 2px solid var(--color-blush-dp);
+    animation: toast-in 0.4s var(--ease-pop) both;
+  }
+
+  .toast-error {
+    border-color: var(--color-flame);
+    color: var(--color-flame-dk);
+  }
+
+  /* ---------------------------------------------- FAQ (native <details>) */
+
+  .faq {
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    transition: box-shadow 0.3s var(--ease-out);
+  }
+
+  .faq + .faq {
+    margin-top: 0.75rem;
+  }
+
+  .faq > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.35rem;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+
+  .faq > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq > summary:hover {
+    color: var(--color-flame);
+  }
+
+  .faq > summary::after {
+    content: "+";
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 999px;
+    background: var(--color-blush);
+    color: var(--color-flame);
+    font-size: 1.15rem;
+    line-height: 1;
+    transition: transform 0.3s var(--ease-pop), background 0.3s;
+  }
+
+  .faq[open] {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .faq[open] > summary::after {
+    transform: rotate(135deg);
+    background: var(--color-bubble-lt);
+  }
+
+  .faq-body {
+    padding: 0 1.35rem 1.3rem;
+    color: var(--color-ink-soft);
+    animation: rise 0.36s var(--ease-out) both;
+  }
+
+  /* ---------------------------------------------- steps (how it works) */
+
+  .step {
+    position: relative;
+    transition: transform 0.35s var(--ease-pop);
+  }
+
+  .step:hover {
+    transform: translateY(-6px);
+  }
+
+  .step-num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: var(--grad-candy);
+    color: #fff;
+    font-family: var(--font-display), sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    box-shadow: 0 10px 22px -12px rgba(232, 56, 79, 0.9);
+    transition: transform 0.35s var(--ease-pop), box-shadow 0.35s;
+  }
+
+  .step:hover .step-num {
+    transform: scale(1.12) rotate(-8deg);
+    box-shadow: 0 16px 30px -12px rgba(232, 56, 79, 0.95);
+  }
+
+  /* The badge bounces in once the step scrolls into view. `backwards` (not
+     `both`) so the finished animation releases the transform back to the
+     stylesheet — otherwise it would outrank the :hover rule below forever. */
+  .step.is-in .step-num {
+    animation: pop-in 0.55s var(--ease-pop) backwards;
+    animation-delay: calc(var(--reveal-delay, 0ms) + 120ms);
+  }
+
+  /* A soft halo pulses out of the badge, one step after another. */
+  .step-num::after {
+    content: "";
+    position: absolute;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    box-shadow: 0 0 0 0 rgba(248, 124, 164, 0.7);
+  }
+
+  .step.is-in .step-num::after {
+    animation: halo 2.4s ease-out infinite;
+    animation-delay: calc(var(--reveal-delay, 0ms) + 500ms);
+  }
+
+  @media (min-width: 1024px) {
+    .step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 2.55rem;
+      left: calc(50% + 2.6rem);
+      right: calc(-50% + 2.6rem);
+      border-top: 3px dotted var(--color-bubble-lt);
+      transform: scaleX(0);
+      transform-origin: left center;
+      transition: transform 0.75s var(--ease-out);
+      transition-delay: calc(var(--reveal-delay, 0ms) + 350ms);
+    }
+
+    .step.is-in:not(:last-child)::before {
+      transform: scaleX(1);
+    }
+  }
+
+  /* ------------------------------------------------ free-shipping meter */
+
+  .meter {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--color-blush-dp);
+    overflow: hidden;
+  }
+
+  .meter > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--grad-candy);
+    transition: width 0.6s var(--ease-out);
+  }
+}
+
+/* ==========================================================================
+   Motion preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal,
+  .reveal-zoom {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flames Store — Next.js E-commerce
 
-## Getting Started
+Production-ready e-commerce for **Flames** soy wax melts, built with Next.js 16, TypeScript, Tailwind CSS 4, Prisma (SQLite), and Auth.js.
 
-First, run the development server:
+## Features
+
+- **Storefront** — Homepage, shop with search/filters/sort, product detail pages
+- **Cart** — Guest cart (cookie) + logged-in user cart (database)
+- **Checkout** — Demo payment (no payment provider), stock validation, transactional orders
+- **Auth** — Customer accounts + owner admin panel
+- **Admin** — Add/edit products, prices, stock; manage order statuses; low-stock alerts
+
+## Quick start
 
 ```bash
+cd flames-store
+npm install
+npm run db:setup
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Demo accounts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Role     | Email                  | Password  |
+|----------|------------------------|-----------|
+| Owner    | admin@flames.example   | admin123  |
+| Customer | hello@example.com      | user123   |
 
-## Learn More
+## Stack
 
-To learn more about Next.js, take a look at the following resources:
+- **Next.js 16** (App Router) + **TypeScript**
+- **Tailwind CSS 4**
+- **Prisma** + **SQLite** (swap to PostgreSQL for production)
+- **Auth.js (NextAuth v5)** — credentials login
+- **Zod** — request validation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Product images
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Place your WebP images in `public/assets/img/` using the paths from the original static site (e.g. `strawberry-packet-800.webp`). A placeholder SVG is included until you add real images.
 
-## Deploy on Vercel
+Copy from the parent project:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cp -r ../assets/img/* public/assets/img/
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Production notes
+
+1. Set `AUTH_SECRET` to a secure random string (32+ chars)
+2. Use PostgreSQL: change `provider` in `prisma/schema.prisma` and `DATABASE_URL`
+3. Connect a payment provider (Razorpay, Stripe) in `/api/checkout`
+4. Deploy to Vercel, Railway, or similar
+
+## Edge cases handled
+
+- Out-of-stock and quantity caps (max 20 per item)
+- Stock decremented atomically at checkout
+- Price/stock re-validated before order placement
+- Empty cart checkout blocked
+- Admin routes protected via middleware
+- Checkout requires login
+- Soft-delete products (hide from shop)
+- Free shipping over ₹999, ₹49 otherwise
+- Indian phone (10-digit) and PIN code validation
