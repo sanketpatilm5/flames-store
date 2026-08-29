@@ -132,23 +132,3 @@ model OrderItem {
   order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product     Product @relation(fields: [productId], references: [id])
 }
-
-/** Approximate visitor analytics — city/region from IP; GPS only if visitor consents */
-model SiteVisit {
-  id        String   @id @default(cuid())
-  sessionId String
-  ipHash    String?
-  city      String?
-  region    String?
-  country   String?
-  latitude  Float?
-  longitude Float?
-  accuracy  Float?
-  source    String   @default("ip")
-  path      String?
-  userAgent String?
-  createdAt DateTime @default(now())
-
-  @@index([sessionId])
-  @@index([createdAt])
-}
