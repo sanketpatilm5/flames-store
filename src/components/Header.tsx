@@ -258,16 +258,22 @@ function CartLink({ count, pulse, compact = false }: { count: number; pulse: num
       <svg
         viewBox="0 0 24 24"
         className="h-[22px] w-[22px] transition-transform duration-300 group-hover:scale-110"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         aria-hidden="true"
       >
-        <path
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M6 7h12l-1 12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 7Zm3 0a3 3 0 0 1 6 0"
-        />
+        {/* Handle */}
+        <path d="M4.5 6.5 7 9.2" />
+        {/* Basket rim */}
+        <path d="M7 9.2h12.5" />
+        {/* Trapezoid basket body */}
+        <path d="M8.2 9.2 9.6 17.2h7.6L18.6 9.2" />
+        {/* Wheels */}
+        <circle cx="10.6" cy="19.2" r="1.15" />
+        <circle cx="16.2" cy="19.2" r="1.15" />
       </svg>
       {count > 0 && (
         <span
